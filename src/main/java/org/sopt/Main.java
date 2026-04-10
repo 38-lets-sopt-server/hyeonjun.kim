@@ -1,7 +1,5 @@
 package org.sopt;
 
-//TIP 코드를 <b>실행</b>하려면 <shortcut actionId="Run"/>을(를) 누르거나
-// 에디터 여백에 있는 <icon src="AllIcons.Actions.Execute"/> 아이콘을 클릭하세요.
 import org.sopt.controller.PostController;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.response.CreatePostResponse;
@@ -40,7 +38,7 @@ public class Main {
                     String author = scanner.nextLine();
                     // 클라이언트가 요청 객체를 만들어서 Controller에 전달
                     CreatePostResponse response = postController.createPost(
-                            new CreatePostRequest(title, content, author)
+                        new CreatePostRequest(title, content, author)
                     );
                     System.out.println(response.message);
                     break;
