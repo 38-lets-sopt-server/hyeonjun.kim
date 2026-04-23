@@ -4,11 +4,17 @@ import org.sopt.domain.Post;
 import org.sopt.exception.PostNotFoundException;
 import org.sopt.repository.PostRepository;
 import org.sopt.validator.PostValidator;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class PostService {
-    private final PostRepository postRepository = new PostRepository();
+    private final PostRepository postRepository;
+
+    public PostService(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
     // createPost() : 새 게시글 생성
     public void createPost(String title, String content, String author) {
@@ -31,14 +37,8 @@ public class PostService {
     // getPost(Long id) : 게시글 단일 조회
     public Post getPost(Long id) {
         // findById()로 찾기
-        Post post = postRepository.findById(id);
-
-        // null이면 예외 던지기
-        if (post == null) {
-            throw new PostNotFoundException(id);
-        }
-        // 찾았으면 반환하기
-        return post;
+        return postRepository.findById(id)
+                .orElseThrow(() -> new PostNotFoundException(id));
     }
 
     // updatePost() : 게시글 수정
@@ -47,10 +47,8 @@ public class PostService {
         PostValidator.validate(title, newContent);
 
         // id로 게시글 찾기
-        Post post = postRepository.findById(id);
-        if (post == null) {
-            throw new PostNotFoundException(id);
-        }
+        Post post = postRepository.findById(id)
+                    .orElseThrow(() -> new PostNotFoundException(id));
 
         // 수정하기
         post.update(title, newContent);
@@ -59,13 +57,8 @@ public class PostService {
     // deletePost() : 게시글 삭제
     public void deletePost(Long id) {
         // id로 게시글 찾기
-        Post post = postRepository.findById(id);
-
-        // 없으면 예외 던지기
-        if (post == null) {
-            throw new PostNotFoundException(id);
-        }
-        // 삭제하기
+        Post post = postRepository.findById(id)
+                    .orElseThrow(() -> new PostNotFoundException(id));
         postRepository.deleteById(id);
     }
 }
