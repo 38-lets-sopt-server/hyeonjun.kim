@@ -1,10 +1,13 @@
 package org.sopt.repository;
 
 import org.sopt.domain.Post;
+import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+@Repository
 public class PostRepository {
     // DB 대신 배열에 저장 (나중에 DB 추가하면 삭제)
     private final List<Post> postList = new ArrayList<>();
@@ -27,13 +30,10 @@ public class PostRepository {
     }
 
     // findById() : id로 특정 게시글 조회
-    public Post findById(Long id) {
-        for (Post post : postList) {
-            if (post.getId().equals(id)) {
-                return post;
-            }
-        }
-        return null;
+    public Optional<Post> findById(Long id) {
+        return postList.stream()
+                .filter(p -> p.getId().equals(id))
+                .findFirst();
     }
 
     // deleteById() : id로 특정 게시글 삭제
