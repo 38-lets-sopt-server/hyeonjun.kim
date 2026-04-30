@@ -22,7 +22,7 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createPost(@RequestBody CreatePostRequest request) {
-        postService.createPost(request.title(), request.content(), request.author());
+        postService.createPost(request.title(), request.content(), request.userId());
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
     }
 

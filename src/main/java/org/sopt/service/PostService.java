@@ -1,5 +1,6 @@
 package org.sopt.service;
 
+import org.sopt.domain.User;
 import org.springframework.transaction.annotation.Transactional;
 import org.sopt.domain.Post;
 // import org.sopt.exception.PostNotFoundException;
@@ -26,19 +27,6 @@ public class PostService {
         this.userRepository = userRepository;
     }
 
-    // createPost() : 새 게시글 생성
-//    public void createPost(String title, String content, String author) {
-//        // 유효성 검증 (PostValidator 사용)
-//        PostValidator.validate(title, content);
-//
-//        // Post 객체 생성
-//        String createAd = java.time.LocalDateTime.now().toString();
-//        Post post = new Post(postRepository.generateId(), title, content, author, createAd);
-//
-//        // 저장
-//        postRepository.save(post);
-//    }
-
     @Transactional
     public void createPost(String title, String content, Long userId) {
         PostValidator.validate(title, content);
@@ -46,7 +34,7 @@ public class PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        Post post = new Post(null, title, content, user);
+        Post post = new Post(title, content, user);
         // ✅ JPA가 ID를 자동 생성하니까 id는 null로 넘겨요
         // postRepository.generateId() 도 이제 필요 없어요
 
