@@ -1,7 +1,7 @@
 package org.sopt.dto.request;
 
-public record CreatePostRequest (
+public record CreatePostRequest(
         String title,
         String content,
-        String author
+        Long userId         // author(String) → userId(Long)으로 변경
 ) {}
