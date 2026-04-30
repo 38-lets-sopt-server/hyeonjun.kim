@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class PostRepository {
+//public class PostRepository {
+public interface PostRepository extends JpaRepository<Post, Long> {
     // DB 대신 배열에 저장 (나중에 DB 추가하면 삭제)
     private final List<Post> postList = new ArrayList<>();
     private Long nextId = 1L;
@@ -20,9 +21,9 @@ public class PostRepository {
     }
 
     // generateId() 메서드 : id 발급
-    public Long generateId() {
-        return nextId++;
-    }
+//    public Long generateId() {
+//        return nextId++;
+//    }
 
     // findAll() 메서드 : 게시글 전체 목록 조회
     public List<Post> findAll() {
