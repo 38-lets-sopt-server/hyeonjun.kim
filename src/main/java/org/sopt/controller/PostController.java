@@ -27,10 +27,14 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts() {
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(postService.getAllPosts().stream()
-                .map(PostResponse::from)
-                .toList()));
+    public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(
+                postService.getAllPosts(page, size).stream()
+                        .map(PostResponse::from)
+                        .toList()));
     }
 
     @GetMapping("/{id}")

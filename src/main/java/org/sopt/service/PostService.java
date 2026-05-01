@@ -1,6 +1,8 @@
 package org.sopt.service;
 
 import org.sopt.domain.User;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.sopt.domain.Post;
 // import org.sopt.exception.PostNotFoundException;
@@ -43,9 +45,12 @@ public class PostService {
 
     // getAllPosts() : 게시글 전체 조회
     @Transactional(readOnly = true)
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<Post> getAllPosts(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return postRepository.findAll(pageable).getContent();
     }
+
+
 
     // getPost(Long id) : 게시글 단일 조회
     @Transactional(readOnly = true)
