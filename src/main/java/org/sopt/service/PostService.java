@@ -1,5 +1,6 @@
 package org.sopt.service;
 
+import org.sopt.domain.BoardType;
 import org.sopt.domain.User;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,22 +31,22 @@ public class PostService {
     }
 
     @Transactional
-    public void createPost(String title, String content, Long userId) {
+    public void createPost(String title, String content, Long userId, BoardType boardType) {
         PostValidator.validate(title, content);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        Post post = new Post(title, content, user);
-        // ✅ JPA가 ID를 자동 생성하니까 id는 null로 넘겨요
-        // postRepository.generateId() 도 이제 필요 없어요
-
+        Post post = new Post(title, content, boardType, user);  // boardType 추가
         postRepository.save(post);
     }
 
     // getAllPosts() : 게시글 전체 조회
     @Transactional(readOnly = true)
-    public List<Post> getAllPosts(int page, int size) {
+    public List<Post> getAllPosts(int page, int size, BoardType boardType) {
+        if (boardType != null) {
+            return postRepository.findAllByBoardType(boardType);  // 게시판별 필터링
+        }
         Pageable pageable = PageRequest.of(page, size);
         return postRepository.findAll(pageable).getContent();
     }

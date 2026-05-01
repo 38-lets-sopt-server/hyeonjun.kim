@@ -1,5 +1,6 @@
 package org.sopt.controller;
 
+import org.sopt.domain.BoardType;
 import org.sopt.dto.request.UpdatePostRequest;
 import org.sopt.dto.response.ApiResponse;
 import org.sopt.service.PostService;
@@ -22,17 +23,18 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createPost(@RequestBody CreatePostRequest request) {
-        postService.createPost(request.title(), request.content(), request.userId());
+        postService.createPost(request.title(), request.content(), request.userId(), request.boardType());
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(null));
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<PostResponse>>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) BoardType boardType  // 추가! 없으면 전체 조회
     ) {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(
-                postService.getAllPosts(page, size).stream()
+                postService.getAllPosts(page, size, boardType).stream()
                         .map(PostResponse::from)
                         .toList()));
     }
