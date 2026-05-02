@@ -1,7 +1,10 @@
 package org.sopt.dto.request;
 
-public record CreatePostRequest (
+import org.sopt.domain.BoardType;
+
+public record CreatePostRequest(
         String title,
         String content,
-        String author
+        Long userId,         // author(String) → userId(Long)으로 변경
+        BoardType boardType
 ) {}

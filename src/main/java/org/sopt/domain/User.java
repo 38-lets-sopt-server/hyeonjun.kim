@@ -1,7 +1,13 @@
 package org.sopt.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 @Entity
-@Table(name = "users")  // "user"는 SQL 예약어라 테이블명을 변경해요
+@Table(name = "users")
 public class User {
 
     @Id

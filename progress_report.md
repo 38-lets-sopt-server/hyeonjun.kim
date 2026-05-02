@@ -26,9 +26,9 @@
 - **1주차 기반**: ✅ `PostNotFoundException.java` 클래스 존재
 - **2주차 완성**: ⚠️ **구조적 불일치** — `GlobalExceptionHandler`에 `@ExceptionHandler(PostNotFoundException.class)` 핸들러가 존재하고 HTTP 404를 반환하나, 실제 `PostService`는 `PostNotFoundException`이 아닌 `NotFoundException`을 throw함. `NotFoundException`에 대한 핸들러는 등록되어 있지 않아 런타임에 이 핸들러가 실제로 호출되지 않음.
 
-### ApiResponse\<T\> 전환
-- **1주차 기반**: ✅ `ApiResponse<T>` 클래스(`success`, `fail` 정적 팩토리 메서드 포함) 존재
-- **2주차 완성**: ⚠️ **부분 적용** — `POST`, `GET`, `PUT` 메서드는 `ResponseEntity<ApiResponse<T>>`로 감싸져 있으나, `deletePost()`가 `ResponseEntity.noContent().build()`를 반환하여 `ApiResponse` 미포함
+### BaseResponse\<T\> 전환
+- **1주차 기반**: ✅ `BaseResponse<T>` 클래스(`success`, `fail` 정적 팩토리 메서드 포함) 존재
+- **2주차 완성**: ⚠️ **부분 적용** — `POST`, `GET`, `PUT` 메서드는 `ResponseEntity<BaseResponse<T>>`로 감싸져 있으나, `deletePost()`가 `ResponseEntity.noContent().build()`를 반환하여 `BaseResponse` 미포함
 
 ### 에러 코드 체계
 - **1주차 기반**: (별도 항목 없음)
@@ -107,11 +107,11 @@
 
 1. **`NotFoundException` 계층 정리**: `PostNotFoundException`과 `NotFoundException`이 병존하여 혼란스러움. `NotFoundException`을 공통 기반 예외로 사용하고 도메인별 예외를 상속 구조로 정리하거나, 반대로 `PostNotFoundException`만 사용하도록 Service 코드 수정 — 둘 중 하나로 통일 권장
 
-2. **`deletePost` 응답 일관성**: DELETE 응답을 `204 No Content`로 유지할지, `ApiResponse<Void>`로 감싸 `200 OK`를 반환할지 팀 컨벤션 기준으로 통일 필요
+2. **`deletePost` 응답 일관성**: DELETE 응답을 `204 No Content`로 유지할지, `BaseResponse<Void>`로 감싸 `200 OK`를 반환할지 팀 컨벤션 기준으로 통일 필요
 
 3. **`PostValidator` Spring Bean화 고려**: 현재 정적 유틸리티로 구현되어 있어 단위 테스트에서 Mock 처리가 어려움. `@Component`로 등록하면 의존성 주입을 통한 테스트가 수월해짐
 
-4. **`ApiResponse` JSON 직렬화 확인**: Getter만 존재하고 Lombok `@Getter` 또는 Jackson 설정이 없으면 JSON 응답이 빈 객체 `{}`로 나올 수 있음. 실제 Postman 테스트로 확인 필요
+4. **`BaseResponse` JSON 직렬화 확인**: Getter만 존재하고 Lombok `@Getter` 또는 Jackson 설정이 없으면 JSON 응답이 빈 객체 `{}`로 나올 수 있음. 실제 Postman 테스트로 확인 필요
 
 ---
 
@@ -125,7 +125,7 @@
 | 🔴 4 | `GlobalExceptionHandler` — `NotFoundException` 핸들러 추가 | 버그 수정 |
 | 🟡 5 | `SpringBootApplication.java` 불필요 파일 삭제 | 정리 |
 | 🟡 6 | `User.java`, `UserRepository.java` import 누락 추가 | 버그 수정 |
-| 🟡 7 | `deletePost()` — `ApiResponse<Void>` 래핑 또는 팀 패턴 통일 | 과제 보완 |
+| 🟡 7 | `deletePost()` — `BaseResponse<Void>` 래핑 또는 팀 패턴 통일 | 과제 보완 |
 | 🟢 8 | 화면설계서 분석 내용 작성 (docs/ 또는 README) | 1주차 필수 |
 | 🟢 9 | Pagination (`@RequestParam page, size`) 구현 | 2주차 심화 |
 | 🟢 10 | BoardType enum + 게시판별 조회 API 구현 | 2주차 심화 |
