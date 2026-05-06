@@ -3,7 +3,6 @@ package org.sopt.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,7 +19,7 @@ public class SwaggerConfig {
                         .description("SOPT Assignment API 문서")
                         .version("v1.0"))
                 .servers(List.of(
-                        new Server().url("/").description("Current Server")
+                        new Server().url("https://hyeonjun-sopt.p-e.kr").description("Production Server")
                 ));
     }
 }
