@@ -1,6 +1,12 @@
 server:
   url: http://localhost:8080
 
+security:
+  jwt:
+    secret: seopsopt-fighting
+    access-token-expires-in-seconds: 1800     # 30분
+    refresh-token-expires-in-seconds: 1209600 # 2주
+
 spring:
   application:
     name: assignment
@@ -19,3 +25,4 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
     show-sql: true
+
