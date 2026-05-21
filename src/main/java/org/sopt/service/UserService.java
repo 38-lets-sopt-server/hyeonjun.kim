@@ -14,8 +14,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void join(String nickname, String email, String paasword) {
-        User user = new User(nickname, email, paasword);
+    public void join(String nickname, String email, String password) {
+        User user = new User(nickname, email, password);
         userRepository.save(user);
     }
 
