@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.BoardType;
 import org.sopt.dto.request.CreatePostRequest;
 import org.sopt.dto.request.UpdatePostRequest;
@@ -13,6 +14,7 @@ import org.sopt.dto.response.PostResponse;
 import org.sopt.service.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,12 +22,10 @@ import java.util.List;
 @Tag(name = "Post", description = "게시글 관련 API")
 @RestController
 @RequestMapping("/posts")
+@RequiredArgsConstructor
 public class PostController {
-    private final PostService postService;
 
-    public PostController(PostService postService) {
-        this.postService = postService;
-    }
+    private final PostService postService;
 
     @Operation(summary = "게시글 작성", description = "새로운 게시글을 작성합니다.")
     @ApiResponses({
@@ -33,8 +33,12 @@ public class PostController {
             @ApiResponse(responseCode = "404", description = "유저를 찾을 수 없음")
     })
     @PostMapping
-    public ResponseEntity<BaseResponse<Void>> createPost(@RequestBody CreatePostRequest request) {
-        postService.createPost(request.title(), request.content(), request.userId(), request.boardType());
+    public ResponseEntity<BaseResponse<Void>> createPost(
+            @RequestBody CreatePostRequest request,
+            Authentication authentication
+    ) {
+        Long userId = Long.parseLong(authentication.getName());
+        postService.createPost(request.title(), request.content(), userId, request.boardType());
         return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.success(null));
     }
 
