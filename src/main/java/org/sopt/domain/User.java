@@ -5,9 +5,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
@@ -15,29 +20,13 @@ public class User {
     private Long id;
 
     private String nickname;
-
     private String email;
-
     private String password;
 
-    protected User() {}
 
-    public User(String nickname, String email) {
+    public User(String nickname, String email, String password) {
         this.nickname = nickname;
         this.email = email;
+        this.password = password;
     }
-
-    public Long getId() {
-        return this.id;
-    }
-
-    public String getNickname() {
-        return this.nickname;
-    }
-
-    public String getEmail() {
-        return this.email;
-    }
-
-    public String getPassword() {return this.password; }
 }
