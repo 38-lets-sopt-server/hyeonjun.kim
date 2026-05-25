@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @Operation(summary = "내 정보 조회 (Access Token 검증)")
-    @GetMapping("/api/v1/me")
+    @GetMapping("/me")
     public ResponseEntity<BaseResponse<UserResponse>> me(Authentication authentication) {
 
         if (authentication == null || authentication.getPrincipal() == null) {
@@ -40,5 +40,15 @@ public class AuthController {
         UserResponse user = authService.getUserById(userId);
 
         return ResponseEntity.ok(BaseResponse.success(user));
+    }
+
+    @Operation(summary = "토큰 재발급 (Refresh Token → 새 토큰 발급)")
+    @PostMapping("/reissue")
+    public ResponseEntity<BaseResponse<TokenResponse>> reissue(
+            @RequestHeader("Authorization") String authorization
+    ) {
+        String refreshToken = authorization.substring("Bearer ".length()).trim();
+        TokenResponse tokens = authService.reissue(refreshToken);
+        return ResponseEntity.ok(BaseResponse.success(tokens));
     }
 }

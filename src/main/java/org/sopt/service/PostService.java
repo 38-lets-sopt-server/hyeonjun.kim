@@ -1,5 +1,6 @@
 package org.sopt.service;
 
+import lombok.RequiredArgsConstructor;
 import org.sopt.domain.BoardType;
 import org.sopt.domain.User;
 import org.springframework.data.domain.PageRequest;
@@ -8,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.sopt.domain.Post;
 // import org.sopt.exception.PostNotFoundException;
 import org.sopt.repository.PostRepository;
-import org.sopt.repository.UserRepository;
+
 import org.sopt.validator.PostValidator;
 import org.springframework.stereotype.Service;
 
@@ -18,24 +19,16 @@ import org.sopt.exception.ErrorCode;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
-
-    public PostService(
-            PostRepository postRepository,
-            UserRepository userRepository
-    ) {
-        this.postRepository = postRepository;
-        this.userRepository = userRepository;
-    }
+    private final UserService userService;
 
     @Transactional
     public void createPost(String title, String content, Long userId, BoardType boardType) {
         PostValidator.validate(title, content);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        User user = userService.findById(userId);
 
         Post post = new Post(title, content, boardType, user);  // boardType 추가
         postRepository.save(post);
