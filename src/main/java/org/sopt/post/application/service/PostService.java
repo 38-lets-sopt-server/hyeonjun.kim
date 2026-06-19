@@ -2,6 +2,9 @@ package org.sopt.post.application.service;
 
 import java.util.List;
 
+import org.sopt.common.exception.BadRequestException;
+import org.sopt.common.exception.ErrorCode;
+import org.sopt.common.exception.NotFoundException;
 import org.sopt.post.application.dto.CreatePostCommand;
 import org.sopt.post.application.dto.UpdatePostCommand;
 import org.sopt.post.application.port.in.CreatePostUseCase;
@@ -34,7 +37,7 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 		validatePostContent(command.title(), command.content());
 
 		User user = userRepositoryPort.findById(command.userId())
-			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
 
 		Post post = new Post(command.title(), command.content(), command.boardType(), user);
 		postRepositoryPort.save(post);
@@ -44,7 +47,7 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 	@Transactional(readOnly = true)
 	public Post getPost(Long id) {
 		return postRepositoryPort.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
 	}
 
 	@Override
@@ -62,7 +65,7 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 		validatePostContent(command.title(), command.content());
 
 		Post post = postRepositoryPort.findById(command.postId())
-			.orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
 
 		post.update(command.title(), command.content());
 		postRepositoryPort.save(post);
@@ -72,16 +75,16 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 	@Transactional
 	public void deletePost(Long id) {
 		Post post = postRepositoryPort.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+			.orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
 		postRepositoryPort.delete(post);
 	}
 
 	private void validatePostContent(String title, String content) {
 		if (title == null || title.isBlank()) {
-			throw new IllegalArgumentException("제목은 비어있을 수 없습니다.");
+			throw new BadRequestException(ErrorCode.POST_TITLE_EMPTY);
 		}
 		if (content == null || content.isBlank()) {
-			throw new IllegalArgumentException("내용은 비어있을 수 없습니다.");
+			throw new BadRequestException(ErrorCode.POST_CONTENT_EMPTY);
 		}
 	}
 }
