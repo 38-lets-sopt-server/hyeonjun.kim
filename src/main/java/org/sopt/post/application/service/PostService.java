@@ -2,7 +2,6 @@ package org.sopt.post.application.service;
 
 import java.util.List;
 
-import org.sopt.common.exception.BadRequestException;
 import org.sopt.common.exception.ErrorCode;
 import org.sopt.common.exception.NotFoundException;
 import org.sopt.post.application.dto.CreatePostCommand;
@@ -12,6 +11,7 @@ import org.sopt.post.application.port.in.DeletePostUseCase;
 import org.sopt.post.application.port.in.GetPostUseCase;
 import org.sopt.post.application.port.in.UpdatePostUseCase;
 import org.sopt.post.application.port.out.PostRepositoryPort;
+import org.sopt.post.application.service.util.PostValidator;
 import org.sopt.post.domain.BoardType;
 import org.sopt.post.domain.Post;
 import org.sopt.user.application.port.out.UserRepositoryPort;
@@ -30,11 +30,13 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 	private final PostRepositoryPort postRepositoryPort;
 	private final UserRepositoryPort userRepositoryPort;
 
+	private final PostValidator postValidator;
+
 	@Override
 	@Transactional
 	public void createPost(CreatePostCommand command) {
 		// 유효성 검증 (도메인 규칙)
-		validatePostContent(command.title(), command.content());
+		postValidator.validate(command.title(), command.content());
 
 		User user = userRepositoryPort.findById(command.userId())
 			.orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
@@ -62,7 +64,7 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 	@Override
 	@Transactional
 	public void updatePost(UpdatePostCommand command) {
-		validatePostContent(command.title(), command.content());
+		postValidator.validate(command.title(), command.content());
 
 		Post post = postRepositoryPort.findById(command.postId())
 			.orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
@@ -77,14 +79,5 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 		Post post = postRepositoryPort.findById(id)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
 		postRepositoryPort.delete(post);
-	}
-
-	private void validatePostContent(String title, String content) {
-		if (title == null || title.isBlank()) {
-			throw new BadRequestException(ErrorCode.POST_TITLE_EMPTY);
-		}
-		if (content == null || content.isBlank()) {
-			throw new BadRequestException(ErrorCode.POST_CONTENT_EMPTY);
-		}
 	}
 }
