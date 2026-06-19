@@ -1,0 +1,87 @@
+package org.sopt.post.application.service;
+
+import java.util.List;
+
+import org.sopt.post.application.dto.CreatePostCommand;
+import org.sopt.post.application.dto.UpdatePostCommand;
+import org.sopt.post.application.port.in.CreatePostUseCase;
+import org.sopt.post.application.port.in.DeletePostUseCase;
+import org.sopt.post.application.port.in.GetPostUseCase;
+import org.sopt.post.application.port.in.UpdatePostUseCase;
+import org.sopt.post.application.port.out.PostRepositoryPort;
+import org.sopt.post.domain.BoardType;
+import org.sopt.post.domain.Post;
+import org.sopt.user.application.port.out.UserRepositoryPort;
+import org.sopt.user.domain.User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class PostService implements CreatePostUseCase, GetPostUseCase,
+	UpdatePostUseCase, DeletePostUseCase {
+
+	// 출력 포트에 의존 (JPA를 직접 의존하지 않음!)
+	private final PostRepositoryPort postRepositoryPort;
+	private final UserRepositoryPort userRepositoryPort;
+
+	@Override
+	@Transactional
+	public void createPost(CreatePostCommand command) {
+		// 유효성 검증 (도메인 규칙)
+		validatePostContent(command.title(), command.content());
+
+		User user = userRepositoryPort.findById(command.userId())
+			.orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+		Post post = new Post(command.title(), command.content(), command.boardType(), user);
+		postRepositoryPort.save(post);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Post getPost(Long id) {
+		return postRepositoryPort.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<Post> getAllPosts(int page, int size, BoardType boardType) {
+		if (boardType != null) {
+			return postRepositoryPort.findAllByBoardType(boardType);
+		}
+		return postRepositoryPort.findAll(page, size);
+	}
+
+	@Override
+	@Transactional
+	public void updatePost(UpdatePostCommand command) {
+		validatePostContent(command.title(), command.content());
+
+		Post post = postRepositoryPort.findById(command.postId())
+			.orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+		post.update(command.title(), command.content());
+		postRepositoryPort.save(post);
+	}
+
+	@Override
+	@Transactional
+	public void deletePost(Long id) {
+		Post post = postRepositoryPort.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+		postRepositoryPort.delete(post);
+	}
+
+	private void validatePostContent(String title, String content) {
+		if (title == null || title.isBlank()) {
+			throw new IllegalArgumentException("제목은 비어있을 수 없습니다.");
+		}
+		if (content == null || content.isBlank()) {
+			throw new IllegalArgumentException("내용은 비어있을 수 없습니다.");
+		}
+	}
+}

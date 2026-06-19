@@ -1,7 +1,7 @@
 package org.sopt.config;
 
 import lombok.RequiredArgsConstructor;
-import org.sopt.filter.JwtAuthFilter;
+import org.sopt.auth.adapter.in.security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
