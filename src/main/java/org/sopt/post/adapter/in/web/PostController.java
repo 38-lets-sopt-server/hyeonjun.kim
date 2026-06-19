@@ -2,6 +2,7 @@ package org.sopt.post.adapter.in.web;
 
 import java.util.List;
 
+import org.sopt.common.response.BaseResponse;
 import org.sopt.post.adapter.in.web.request.CreatePostRequest;
 import org.sopt.post.adapter.in.web.request.UpdatePostRequest;
 import org.sopt.post.adapter.in.web.response.PostResponse;
@@ -37,17 +38,17 @@ public class PostController {
 	private final DeletePostUseCase deletePostUseCase;
 
 	@PostMapping
-	public ResponseEntity<Void> createPost(
+	public ResponseEntity<BaseResponse<Void>> createPost(
 		@RequestBody CreatePostRequest request,
 		Authentication authentication
 	) {
 		Long userId = Long.parseLong(authentication.getName());
 		createPostUseCase.createPost(request.toCommand(userId));
-		return ResponseEntity.status(HttpStatus.CREATED).build();
+		return ResponseEntity.status(HttpStatus.CREATED).body(BaseResponse.success(null));
 	}
 
 	@GetMapping
-	public ResponseEntity<List<PostResponse>> getAllPosts(
+	public ResponseEntity<BaseResponse<List<PostResponse>>> getAllPosts(
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(required = false) BoardType boardType
@@ -56,26 +57,27 @@ public class PostController {
 			.stream()
 			.map(PostResponse::from)
 			.toList();
-		return ResponseEntity.ok(posts);
+		return ResponseEntity.ok(BaseResponse.success(posts));
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<PostResponse> getPost(@PathVariable Long id) {
-		return ResponseEntity.ok(PostResponse.from(getPostUseCase.getPost(id)));
+	public ResponseEntity<BaseResponse<PostResponse>> getPost(@PathVariable Long id) {
+		PostResponse post = PostResponse.from(getPostUseCase.getPost(id));
+		return ResponseEntity.ok(BaseResponse.success(post));
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<Void> updatePost(
+	public ResponseEntity<BaseResponse<Void>> updatePost(
 		@PathVariable Long id,
 		@RequestBody UpdatePostRequest request
 	) {
 		updatePostUseCase.updatePost(request.toCommand(id));
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(BaseResponse.success(null));
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deletePost(@PathVariable Long id) {
+	public ResponseEntity<BaseResponse<Void>> deletePost(@PathVariable Long id) {
 		deletePostUseCase.deletePost(id);
-		return ResponseEntity.ok().build();
+		return ResponseEntity.ok(BaseResponse.success(null));
 	}
 }
