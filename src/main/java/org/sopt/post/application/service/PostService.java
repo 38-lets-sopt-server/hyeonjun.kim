@@ -1,9 +1,8 @@
 package org.sopt.post.application.service;
 
-import java.util.List;
-
 import org.sopt.common.exception.ErrorCode;
 import org.sopt.common.exception.NotFoundException;
+import org.sopt.post.adapter.in.web.response.PostResponse;
 import org.sopt.post.application.dto.CreatePostCommand;
 import org.sopt.post.application.dto.UpdatePostCommand;
 import org.sopt.post.application.port.in.CreatePostUseCase;
@@ -16,6 +15,9 @@ import org.sopt.post.domain.BoardType;
 import org.sopt.post.domain.Post;
 import org.sopt.user.application.port.out.UserRepositoryPort;
 import org.sopt.user.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,18 +49,18 @@ public class PostService implements CreatePostUseCase, GetPostUseCase,
 
 	@Override
 	@Transactional(readOnly = true)
-	public Post getPost(Long id) {
-		return postRepositoryPort.findById(id)
+	public PostResponse getPost(Long id) {
+		Post post = postRepositoryPort.findById(id)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.POST_NOT_FOUND));
+		return PostResponse.from(post);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Post> getAllPosts(int page, int size, BoardType boardType) {
-		if (boardType != null) {
-			return postRepositoryPort.findAllByBoardType(boardType);
-		}
-		return postRepositoryPort.findAll(page, size);
+	public Page<PostResponse> getAllPosts(int page, int size, BoardType boardType) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Post> postPage = postRepositoryPort.findAll(boardType, pageable);
+		return postPage.map(PostResponse::from);
 	}
 
 	@Override

@@ -1,10 +1,11 @@
 package org.sopt.post.application.port.out;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.sopt.post.domain.BoardType;
 import org.sopt.post.domain.Post;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface PostRepositoryPort {
 
@@ -12,9 +13,7 @@ public interface PostRepositoryPort {
 
 	Optional<Post> findById(Long id);
 
-	List<Post> findAll(int page, int size);
-
-	List<Post> findAllByBoardType(BoardType boardType);
+	Page<Post> findAll(BoardType boardType, Pageable pageable);
 
 	void delete(Post post);
 }

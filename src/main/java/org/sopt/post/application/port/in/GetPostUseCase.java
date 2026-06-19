@@ -1,12 +1,12 @@
 package org.sopt.post.application.port.in;
 
-import java.util.List;
-
+import org.sopt.post.adapter.in.web.response.PostResponse;
 import org.sopt.post.domain.BoardType;
-import org.sopt.post.domain.Post;
+import org.springframework.data.domain.Page;
 
 public interface GetPostUseCase {
-	Post getPost(Long id);
 
-	List<Post> getAllPosts(int page, int size, BoardType boardType);
+	PostResponse getPost(Long id);
+
+	Page<PostResponse> getAllPosts(int page, int size, BoardType boardType);
 }

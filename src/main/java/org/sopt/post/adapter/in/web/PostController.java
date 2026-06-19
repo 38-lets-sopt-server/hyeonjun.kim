@@ -1,7 +1,5 @@
 package org.sopt.post.adapter.in.web;
 
-import java.util.List;
-
 import org.sopt.common.response.BaseResponse;
 import org.sopt.post.adapter.in.web.request.CreatePostRequest;
 import org.sopt.post.adapter.in.web.request.UpdatePostRequest;
@@ -11,6 +9,7 @@ import org.sopt.post.application.port.in.DeletePostUseCase;
 import org.sopt.post.application.port.in.GetPostUseCase;
 import org.sopt.post.application.port.in.UpdatePostUseCase;
 import org.sopt.post.domain.BoardType;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -48,21 +47,18 @@ public class PostController {
 	}
 
 	@GetMapping
-	public ResponseEntity<BaseResponse<List<PostResponse>>> getAllPosts(
+	public ResponseEntity<BaseResponse<Page<PostResponse>>> getAllPosts(
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(required = false) BoardType boardType
 	) {
-		List<PostResponse> posts = getPostUseCase.getAllPosts(page, size, boardType)
-			.stream()
-			.map(PostResponse::from)
-			.toList();
+		Page<PostResponse> posts = getPostUseCase.getAllPosts(page, size, boardType);
 		return ResponseEntity.ok(BaseResponse.success(posts));
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<BaseResponse<PostResponse>> getPost(@PathVariable Long id) {
-		PostResponse post = PostResponse.from(getPostUseCase.getPost(id));
+		PostResponse post = getPostUseCase.getPost(id);
 		return ResponseEntity.ok(BaseResponse.success(post));
 	}
 
